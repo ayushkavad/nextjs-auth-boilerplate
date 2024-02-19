@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { AuthContext } from '@/contexts/authContext';
-import paths from '@/router/paths';
 import { api } from '@/services/api';
+import { ROUTES } from '@/router/router';
+import { AuthContext } from '@/contexts/authContext';
 import { setAuthorizationHeader } from '@/services/interceptors';
 import {
   createSessionCookies,
@@ -13,10 +13,9 @@ import {
 function AuthProvider(props) {
   const { children } = props;
 
-  const router = useRouter();
-
   const [user, setUser] = useState();
   const [loadingUserData, setLoadingUserData] = useState(true);
+  const router = useRouter();
 
   const token = getToken();
   const isAuthenticated = Boolean(token);
@@ -26,11 +25,10 @@ function AuthProvider(props) {
 
     try {
       const response = await api.post('/login', { email, password });
-      const userData = response.data.data;
-      const { token, refreshToken } = userData;
+      const { token, refreshToken, user } = response.data.data;
 
       createSessionCookies({ token, refreshToken });
-      setUser({ user });
+      setUser({ email: user.email });
       setAuthorizationHeader({ request: api.defaults, token });
     } catch (error) {
       const err = error;
@@ -40,9 +38,9 @@ function AuthProvider(props) {
 
   function signOut() {
     removeSessionCookies();
-    setUser(null);
+    setUser(undefined);
     setLoadingUserData(false);
-    router.push(paths.LOGIN_PATH);
+    router.push(ROUTES.login.index());
   }
 
   useEffect(() => {
@@ -61,9 +59,10 @@ function AuthProvider(props) {
 
       try {
         const response = await api.get('/me');
-        if (response?.data) {
+
+        if (response?.data?.data) {
           const { user } = response.data.data;
-          setUser({ user });
+          setUser({ email: user.email });
         }
       } catch (error) {
         /**

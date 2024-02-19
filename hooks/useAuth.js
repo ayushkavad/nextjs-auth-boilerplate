@@ -1,12 +1,12 @@
 import { useContext } from 'react';
 import { AuthContext } from '@/contexts/authContext';
 
-function useSession() {
+function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useSession must be use within AuthProvider');
+    throw new Error('useAuth must be use within AuthProvider');
   }
   return context;
 }
 
-export default useSession;
+export default useAuth;

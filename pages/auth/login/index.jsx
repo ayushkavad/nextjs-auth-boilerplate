@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import useSession from '@/hooks/useSession';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { ROUTES } from '@/router/router';
+import useAuth from '@/hooks/useAuth';
 
 function initialFormValues() {
   return {
@@ -11,7 +13,8 @@ function initialFormValues() {
 function Login() {
   const [values, setValues] = useState(initialFormValues);
   const [loginRequestStatus, setLoginRequestStatus] = useState('success');
-  const { signIn } = useSession();
+  const { isAuthenticated, signIn } = useAuth();
+  const router = useRouter();
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -39,9 +42,12 @@ function Login() {
   }
 
   useEffect(() => {
-    // clean the function to prevent memory leak
+    if (isAuthenticated) {
+      router.push(ROUTES.index());
+    }
+
     return () => setLoginRequestStatus('success');
-  }, []);
+  }, [isAuthenticated, router]);
 
   return (
     <div>
@@ -54,7 +60,6 @@ function Login() {
             type="email"
             name="email"
             id="email"
-            required
             disabled={loginRequestStatus === 'loading'}
             onChange={handleChange}
           />
@@ -68,7 +73,6 @@ function Login() {
             type="password"
             name="password"
             id="password"
-            required
             disabled={loginRequestStatus === 'loading'}
             onChange={handleChange}
           />

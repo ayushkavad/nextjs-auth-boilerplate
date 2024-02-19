@@ -1,11 +1,11 @@
+import { api } from './api';
+import { ROUTES } from '@/router/router';
 import {
   createSessionCookies,
   getRefreshToken,
   getToken,
   removeSessionCookies,
 } from '@/utils/tokenCookies';
-import paths from '@/router/paths';
-import { api } from './api';
 
 let isRefreshing = false;
 let failedRequestQueue = [];
@@ -89,7 +89,7 @@ function onResponseError(error) {
       });
     } else {
       removeSessionCookies();
-      window.location.href = paths.LOGIN_PATH;
+      window.location.href = ROUTES.login.index();
     }
   }
 
